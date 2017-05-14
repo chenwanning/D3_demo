@@ -1,0 +1,16 @@
+body {}
+
+body pre {
+	font-size: 16px;
+}
+
+footer {
+	height: 160px;
+	margin-top: 120px;
+	text-align: left;
+	font-size: 10;
+	background-color: rgba(53, 100, 70, 0.93);
+	color: aliceblue;
+	padding: 5px;
+	text-align: left;
+}

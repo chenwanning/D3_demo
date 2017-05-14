@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Untitled Document</title>
+	<script src="https://d3js.org/d3.v3.js"></script>
+	<script src="topojson.min.js"></script>
+	<style>
+		.map-boundary {
+			stroke: #eee;
+		}
+	</style>
+</head>
+
+<body>
+	<h1>臺灣前十大公司位置圖</h1>
+
+	<svg width="1500" height="2200"></svg>
+
+
+
+	<script>
+		// 2.地理投影器: 設定投影方式(麥卡托)、定位點([經度,緯度])、縮放(scale)
+		var projection = d3.geo.mercator()
+			.center([121, 24])
+			.scale(30000)
+			.translate([1200 / 2, 1500 / 2]);
+
+		//1.地理資料檔: GeoJSON or TopoJSON
+		d3.csv("500company.csv", function(dataSet) {
+			d3.json("tw-map-topo.json", function(mapDataSet) {
+
+				console.log(dataSet);
+				console.log(mapDataSet);
+
+				bind(mapDataSet, dataSet);
+				render();
+			});
+		});
+
+
+		function render() {
+			var fScale = d3.scale.category20();
+			//			var tmp_color;
+			var xScale = d3.scale.linear()
+				.domain([1311, 3300])
+				.range([5, 10]);
+			var quantize = d3.scale.quantize()
+				.domain([1311, 3300])
+				.range(["#fcfc0b", "#f8be22", "#ff730d", "#ff0080", "#ff1400"]);
+			d3.selectAll("path")
+				.style({
+					fill: "#28737c",
+
+
+				});
+			//			console.log(projection([121, 25]));
+
+			d3.selectAll("circle")
+				.attr(
+					"cx",
+					function(d) {
+						return projection([d.log, d.lat])[0];
+					})
+				.attr(
+					"cy",
+					function(d) {
+						return projection([d.log, d.lat])[1];
+					})
+				.attr("r", function(d) {
+					return xScale(d.money);
+				}).style("fill", function(d) {
+					return quantize(d.money);
+				});
+		}
+
+		function bind(topoRoot, dataSet) {
+
+			// 3.路徑產生器: d3.geo.path()
+			var path = d3.geo.path().projection(projection);
+
+			console.log(topoRoot);
+			// 4.地理資料檔: 使用topojson.js載入地理資料
+			var geoRoot = topojson.feature(topoRoot, topoRoot.objects["COUNTY_MOI_1051214"]);
+
+
+			console.log(geoRoot);
+			// 綁定path與載入的地理資料(features:每一地理區劃)
+			var selection = d3.select("svg").selectAll("path").data(geoRoot.features);
+
+			selection.enter().append("path").classed("map-boundary", true).attr("d", path); //ture時把map-boundary加到path中
+			selection.exit().remove();
+
+			var selection_c = d3.select("svg").selectAll("circle").data(dataSet);
+			selection_c.enter().append("circle");
+			selection_c.exit().remove();
+
+		}
+	</script>
+
+</body>
+
+</html>
