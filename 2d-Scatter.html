@@ -148,6 +148,7 @@
 
 			//開始畫圈圈
 			d3.selectAll("circle")
+				.transition().duration(1200)
 				.attr({
 					cx: function(d) {
 						return xScale(d.address) + 50;
@@ -162,6 +163,8 @@
 						return fScale(letterList.indexOf(d.address));
 					}
 				})
+
+			d3.selectAll("circle")
 				.on("mouseover", function(d) { //綁定資料
 					var posX = d3.select(this).attr("cx"); //this是球、滑鼠當下移動的點
 					var posY = d3.select(this).attr("cy");
